@@ -4,7 +4,7 @@
 
 The Event Management System is a microservice-based platform for managing events with real-time notifications. The system consists of three core microservices that communicate through RabbitMQ message broker, using MongoDB for data persistence and JWT for authentication.
 
-![Architecture Diagram](https://via.placeholder.com/800x400?text=Event+Management+System+Architecture)
+![Architecture Diagram](https://raw.githubusercontent.com/aslanahmtv/event-management-system/refs/heads/main/image.png)
 
 ### Core Services
 
