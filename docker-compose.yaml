@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  # Event Service - responsible for event CRUD operations
+  event-service:
+    build:
+      context: ./event-service
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - event-service/.env.docker
+    depends_on:
+      - mongodb
+      - rabbitmq
+    volumes:
+      - ./event-service:/app
+    networks:
+      - event-network
+    restart: unless-stopped
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    ports:
+      - "3002:3002"
+    env_file:
+      - auth-service/.env.docker
+    depends_on:
+      - mongodb
+      - rabbitmq
+    volumes:
+      - ./auth-service:/app
+    networks:
+      - event-network
+    restart: unless-stopped
+
+  # Notification Service - handles WebSocket connections and notifications
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    env_file:
+      - notification-service/.env.docker
+    depends_on:
+      - mongodb
+      - rabbitmq
+      - event-service
+    volumes:
+      - ./notification-service:/app
+    networks:
+      - event-network
+    restart: unless-stopped
+
+  # MongoDB - shared database for both services
+  mongodb:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - event-network
+    restart: unless-stopped
+
+  # RabbitMQ - message broker for communication between services
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"   # AMQP port
+      - "15672:15672" # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - event-network
+    restart: unless-stopped
+
+networks:
+  event-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
+  rabbitmq_data:
