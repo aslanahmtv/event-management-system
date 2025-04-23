@@ -18,6 +18,6 @@ RUN ./scripts/install.sh
 # Copy the rest of the files
 COPY . .
 
-EXPOSE 3002
+EXPOSE 3001
 
 CMD ["./scripts/run_app.sh"]
